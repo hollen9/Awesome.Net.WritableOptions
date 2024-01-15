@@ -31,7 +31,7 @@ namespace Awesome.Net.WritableOptions
             _defaultSerializerOptions = defaultSerializerOptions == null ? JsonFileHelper.DefaultSerializerOptions() : defaultSerializerOptions();
         }
 
-        public void Update(Action<T> updateAction, bool reload = true, JsonSerializerOptions serializerOptions = null)
+        public void Update(Func<T, T> updateAction, bool reload = true, JsonSerializerOptions serializerOptions = null)
         {
             JsonFileHelper.AddOrUpdateSection(_jsonFilePath, _sectionName, updateAction, serializerOptions ?? _defaultSerializerOptions);
 
@@ -39,6 +39,11 @@ namespace Awesome.Net.WritableOptions
             {
                 _configuration?.Reload();
             }
+        }
+
+        public void Reload()
+        {
+            _configuration?.Reload();
         }
     }
 }

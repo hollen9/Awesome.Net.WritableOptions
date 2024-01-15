@@ -17,13 +17,13 @@ namespace Awesome.Net.WritableOptions.Extensions
             };
         });
 
-        public static void AddOrUpdateSection<T>(string jsonFilePath, string sectionName, Action<T> updateAction = null, JsonSerializerOptions serializerOptions = null)
+        public static void AddOrUpdateSection<T>(string jsonFilePath, string sectionName, Func<T, T> updateAction = null, JsonSerializerOptions serializerOptions = null)
             where T : class, new()
         {
             if(serializerOptions == null) serializerOptions = DefaultSerializerOptions();
             var updatedValue = TryGet<T>(jsonFilePath, sectionName, out var value, serializerOptions) ? value : new T();
 
-            updateAction?.Invoke(updatedValue);
+            updatedValue = updateAction?.Invoke(updatedValue);
 
             AddOrUpdateSection(jsonFilePath, sectionName, updatedValue, serializerOptions);
         }
@@ -77,6 +77,8 @@ namespace Awesome.Net.WritableOptions.Extensions
                 {
                     if(jsonDocument.RootElement.TryGetProperty(sectionName, out var sectionValue))
                     {
+                        string typeName = typeof(T).Name;
+                        string jsonValueString = sectionValue.ToString();
                         if(serializerOptions == null) serializerOptions = DefaultSerializerOptions();
                         value = JsonSerializer.Deserialize<T>(sectionValue.ToString(), serializerOptions);
                         return true;
